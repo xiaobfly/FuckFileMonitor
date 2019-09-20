@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs/FuckFileMonitor/v16
+/bin
+/tmp/Win32/Debug/FuckFileMonitor
+/tmp/x64/Debug/FuckFileMonitor/FuckFileMonitor.tlog
+/tmp/x64/Debug/FuckFileMonitor
