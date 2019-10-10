@@ -17,6 +17,22 @@ struct FileInformation
     char picName[64];
 };
 
+std::vector<std::string> split(std::string srcStr, const std::string& delim)
+{
+	int nPos = 0;
+	std::vector<std::string> vec;
+	nPos = srcStr.find(delim.c_str());
+	while (-1 != nPos)
+	{
+		std::string temp = srcStr.substr(0, nPos);
+		vec.push_back(temp);
+		srcStr = srcStr.substr(nPos + 1);
+		nPos = srcStr.find(delim.c_str());
+	}
+	vec.push_back(srcStr);
+	return vec;
+}
+
 std::string getCurrentDirectory()
 {
     char moduleFileName[MAX_PATH * 4] = { 0 };
@@ -283,8 +299,12 @@ int main(int argv, char* argc[])
                 j = 0;
                 k++;
             }
-
-            std::string name = std::string(argc[4]) + "\\" + getPathFileName(picfiles[j]) + std::to_string(k);
+			auto tmp = split(getPathFileName(picfiles[j]), ".");
+			if (tmp.empty() || tmp.size() < 2)
+			{
+				continue;
+			}
+            std::string name = std::string(argc[4]) + "\\" + tmp[0] + std::to_string(k) + "." + tmp[1];
             printf("encrypt %s - %s - %s\n", picfiles[j].c_str(), files[i].c_str(), name.c_str());
 
             if (encrypt(picfiles[j], files[i], name))
