@@ -4,8 +4,12 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 rem 需要加密的目录
 set _enc_dir_=zencrypt
 
+if not "%1"=="" set _enc_dir_=%1
+
 rem 生成加密后的目录
 set _done_dir=done
+
+if not "%2"=="" set _enc_dir_=%2
 
 rem 伪装的图片目录(记得png图片)
 set _pic_img_=pic
