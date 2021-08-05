@@ -1,19 +1,21 @@
 @echo off
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-rem 需要加密的目录
 set _enc_dir_=zencrypt
 
-rem 生成加密后的目录
+if not "%1"=="" set _enc_dir_=%1
+
 set _done_dir=done
 
-rem 伪装的图片目录(记得png图片)
+if not "%2"=="" set _enc_dir_=%2
+
+
 set _pic_img_=pic
 
-rem 设置分包单个文件大小,单位MB
+
 set _file_size_=5
 
-rem 设置加密密码
+
 set _password_=123456
 
 del /Q done\*.*
