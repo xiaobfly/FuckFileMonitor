@@ -14,5 +14,9 @@ rem …Ë÷√º”√‹√‹¬Î
 set _password_=123456
 
 del /Q tmp\*.*
+
+mkdir tmp
+mkdir %_dec_dir_%
+
 .\FuckFileMonitor.exe decrypt %_pic_img_% %_done_dir% tmp
-.\7z.exe x -aoa -p%_password_% -o%_dec_dir_% tmp/decrypt.7z.*
+.\7z.exe x -aoa -p%_password_% -o%_dec_dir_% tmp/*.7z.*

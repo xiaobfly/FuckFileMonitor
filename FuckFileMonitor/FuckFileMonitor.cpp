@@ -149,6 +149,14 @@ bool encrypt(const std::string& pic, const std::string& zip, const std::string& 
         int length = name.length() < sizeof(fileInfo.picName) ? name.length() : sizeof(fileInfo.picName);
         name.copy(fileInfo.picName, length);
 
+        for (size_t i = 0; i < _countof(fileInfo.picName); i++)
+        {
+            if (fileInfo.picName[i])
+            {
+                fileInfo.picName[i] ^= 'x';
+            }
+        }
+
         if (!getFileContent(pic, 0, &buf, &size))
         {
             printf("get file size fail!\n");
@@ -199,7 +207,7 @@ bool encrypt(const std::string& pic, const std::string& zip, const std::string& 
     return result;
 }
 
-bool decrypt(const std::string & zip, const std::string& save)
+bool decrypt(const std::string & zip, const std::string& saveDir)
 {
     size_t size = 0;
     char* buf = nullptr;
@@ -233,7 +241,13 @@ bool decrypt(const std::string & zip, const std::string& save)
             return false;
         }
 
-        if (!setFileContent(save, &buf[pFileInfo->picSize], pFileInfo->encSize))
+        for (size_t i = 0; i < picName.length(); i++)
+        {
+            picName[i] ^= 'x';
+        }
+
+        auto path = saveDir + "\\" + picName;
+        if (!setFileContent(path, &buf[pFileInfo->picSize], pFileInfo->encSize))
         {
             printf("set file content fail!\n");
             return false;
@@ -259,11 +273,12 @@ int main(int argv, char* argc[])
         return 1;
     }
     bool enc = false;
-    if (0 == _stricmp("encrypt", argc[1]))
+    std::string type(argc[1]);
+    if (type == "encrypt")
     {
         enc = true;
     }
-    else if (0 == _stricmp("decrypt", argc[1]))
+    else if (type == "decrypt")
     {
         enc = false;
     }
@@ -273,23 +288,26 @@ int main(int argv, char* argc[])
         return 1;
     }
 
+    std::string picDir(argc[2]);
     std::vector<std::string> picfiles;
     if (enc)
     {
-        if (!getDirectoryFiles(argc[2], picfiles) || picfiles.empty())
+        if (!getDirectoryFiles(picDir, picfiles) || picfiles.empty())
         {
             printf("get picfiles fail!\n");
             return 1;
         }
     }
 
+    std::string tmpDir(argc[3]);
     std::vector<std::string> files;
-    if (!getDirectoryFiles(argc[3], files) || files.empty())
+    if (!getDirectoryFiles(tmpDir, files) || files.empty())
     {
         printf("get files fail!\n");
         return 1;
     }
     
+    std::string doneDir(argc[4]);
     for (size_t i = 0, j = 0, k = 0; i < files.size(); i++, j++)
     {        
         if (enc)
@@ -304,7 +322,7 @@ int main(int argv, char* argc[])
 			{
 				continue;
 			}
-            std::string name = std::string(argc[4]) + "\\" + tmp[0] + std::to_string(k) + "." + tmp[1];
+            std::string name = doneDir + std::string("\\" + tmp[0] + std::to_string(k) + "." + tmp[1]);
             printf("encrypt %s - %s - %s\n", picfiles[j].c_str(), files[i].c_str(), name.c_str());
 
             if (encrypt(picfiles[j], files[i], name))
@@ -314,13 +332,9 @@ int main(int argv, char* argc[])
         }
         else
         {
-            char save[512] = { 0 };
-            sprintf_s(save, sizeof(save), "%s/decrypt.7z.%05ld", argc[4], i + 1);
-            printf("decrypt %s - %s\n", files[i].c_str(), save);
-
-            if (decrypt(files[i], save))
+            if (decrypt(files[i], doneDir))
             {
-                printf("decrypt %s - %s done!\n", files[i].c_str(), save);
+                printf("decrypt %s - %s done!\n", files[i].c_str(), doneDir.c_str());
             }
         }
     }
